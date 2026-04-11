@@ -151,7 +151,7 @@ for j in range(data['num_vars']):
     
 # 제약조건
 for i in range(data['num_constraints']):
-    constraint_expr = [data['constraint_coeffs'][i][j] * x[j] for j in range(data['num_vars'])]
+    constraint_expr = [data['constraint_coeffs'][i][j] * x[j]/16 for j in range(data['num_vars'])]
     solver.Add(sum(constraint_expr) <= data['supply'][i])
     
 # 목적함수
@@ -177,20 +177,52 @@ else:
 from ortools.linear_solver import pywraplp
 from or2_4_data import *
 
+# 솔버 객체 생성
+solver = pywraplp.Solver.CreateSolver("SCIP")
 
+# 의사결정 변수
+foods = [solver.NumVar(0.0, solver.infinity(), item[0]) for item in data]
 
+# foods = []
+# for item in data:
+#     food = solver.NumVar(0, solver.infinity(), item[0])
+#     foods.append(food)
 
+# 솔버 객체에 저장된 변수 개수 출력
+print("Number of variables =", solver.NumVariables())
 
+# 제약조건
+constraints = []
+for i, nutrient in enumerate(nutrients):
+    constraints.append(solver.Constraint(nutrient[1], solver.infinity()))
+    for j, item in enumerate(data):
+        constraints[i].SetCoefficient(foods[j], item[i + 3])
 
+print("Number of constraints =", solver.NumConstraints())
 
+# 목적함수
+objective = solver.Objective()
+for j, food in enumerate(foods):
+    objective.SetCoefficient(food, data[j][2])
+objective.SetMinimization()
 
+status = solver.Solve()
 
+# 해 출력: 각 음식별 구매량 출력
+nutrients_result=[0]*len(nutrients)
+print("\nAnnual Foods:")
+for i, food in enumerate(foods):
+    if food.solution_value() > 0.0:
+        print("{}: ${}".format(data[i][0], 365.0 * food.solution_value()))
+        for j, _ in enumerate(nutrients):
+            nutrients_result[j] += data[i][j + 3] * food.solution_value()
+print("\nOptimal annual price: ${:.4f}".format(365.0 * objective.Value()))
 
-
-
-
-
-
+print("\nNutrients per day:")
+for i, nutrient in enumerate(nutrients):
+    print(
+        "{}: {:.2f} (min {})".format(nutrient[0], nutrients_result[i], nutrient[1])
+    )
 
 
 
