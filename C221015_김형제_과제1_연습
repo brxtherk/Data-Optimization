@@ -1,0 +1,45 @@
+# 문제 1: 정유소 원유 구입 최적화 문제
+
+from ortools.linear_solver import pywraplp
+
+def LinearProgrammingExample():
+    # 솔버 생성
+    solver = pywraplp.Solver.CreateSolver('GLOP')
+    if not solver:
+        return
+    # ========== 의사결정 변수 ==========
+    # x: 하루에 구입할 사우디산 원유 배럴 수
+    # 범위: 0<= x <= 9000 (하루 최대 9000배럴 구입 가능)
+    x = solver.NumVar(0.0, 9000, "하루에 구입할 사우디산 원유 배럴 수")
+    
+    # y: 하루에 구입할 베네수엘라산 원유 배럴 수
+    # 범위: 0<= x <= 6000 (하루 최대 6000배럴 구입 가능)
+    y = solver.NumVar(0.0, 6000, "하루에 구입할 베네수엘라산 원유 배럴 수")
+
+    # =========== 제약 조건 ==========
+    # 매일 최소 2000배럴의 가솔린, 1500배럴의 제트유, 500배럴의 윤활유 공급
+    # 제약1: 가솔릴 소유 충족
+    # 사우디산 0.3배럴
+    solver.Add(0.3*x + 0.4*y >= 2000)
+    solver.Add(0.4*x + 0.2*y >= 1500)
+    solver.Add(0.2*x + 0.3*y >= 500)
+
+    # 목적함수
+    # 총 비용: $60 * x + $55 * y (min)
+    objective = solver.Objective()
+    solver.Minimize(60*x + 55*y)
+
+    # 실행
+    status = solver.Solve()
+
+    # 결과 출력
+    if status == pywraplp.Solver.OPTIMAL:
+        print("Solution")
+        print(f"Objective value = {objective.Value():0.1f}")
+        print(f"x = {x.solution_value():0.1f}")
+        print(f"y = {y.solution_value():0.1f}")
+    else:
+        print("The problem does not have an optimal solution.")
+        
+LinearProgrammingExample()
+
