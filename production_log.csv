@@ -1,4 +1,4 @@
-﻿date,product,quantity,oven_hours,material_kg,total_cost
+date,product,quantity,oven_hours,material_kg,total_cost
 2024-01-01,A,65,32.76,20.94,159821.0
 2024-01-01,B,56,44.82,27.02,239111.0
 2024-01-02,A,71,34.3,21.37,175873.0
