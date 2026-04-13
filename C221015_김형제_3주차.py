@@ -276,7 +276,7 @@ else:
 # ---------------------------------------------------------
 
 # 2. 파일로부터 데이터 읽기
-delivery = pd.read_csv('delivery_log.csv')
+delivery = pd.read_csv('delivery_log.csv', parse_dates=['week_start'])
 contract = pd.read_csv('contract_demand.csv')
 capacity = pd.read_csv('capacity_today.csv')
 
