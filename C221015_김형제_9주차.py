@@ -612,3 +612,73 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# 코드제출 6 (실습 1)
+from ortools.constraint_solver import routing_enums_pb2
+from ortools.constraint_solver import pywrapcp
+
+def create_data_model():
+    data = {}
+    # 6x6 거리(Setup 시간) 행렬
+    # 인덱스: 0(더미/없음), 1(A), 2(B), 3(C), 4(D), 5(E)
+    data["distance_matrix"] = [
+        # 0   A   B   C   D   E  (도착)
+        [ 0,  4,  5,  8,  9,  4], # 0 (더미: 시작) -> 각 작업 첫 Setup
+        [ 0,  0,  7, 12, 10,  9], # A -> 더미로 돌아가는 비용은 0 (Open-tour)
+        [ 0,  6,  0, 10, 14, 11], # B -> "
+        [ 0, 10, 11,  0, 12, 10], # C -> "
+        [ 0,  7,  8, 15,  0,  7], # D -> "
+        [ 0, 12,  9,  8, 16,  0], # E -> "
+    ]
+    data["num_vehicles"] = 1
+    data["depot"] = 0 # 더미 노드를 출발점(Depot)으로 설정
+    return data
+
+def print_solution(manager, routing, solution):
+    """결과를 출력합니다."""
+    print(f"Objective (최소 Setup 시간): {solution.ObjectiveValue()}")
+    
+    index = routing.Start(0)
+    plan_output = "최적 작업 순서:\n"
+    route_distance = 0
+    
+    while not routing.IsEnd(index):
+        plan_output += f" {manager.IndexToNode(index)} ->"
+        previous_index = index
+        index = solution.Value(routing.NextVar(index))
+        route_distance += routing.GetArcCostForVehicle(previous_index, index, 0)
+        
+    plan_output += f" {manager.IndexToNode(index)}\n"
+    plan_output += f"총 Setup 시간: {route_distance}"
+    
+    print(plan_output)
+
+def main():
+    data = create_data_model()
+
+    manager = pywrapcp.RoutingIndexManager(
+        len(data["distance_matrix"]), data["num_vehicles"], data["depot"]
+    )
+
+    routing = pywrapcp.RoutingModel(manager)
+
+    def distance_callback(from_index, to_index):
+        from_node = manager.IndexToNode(from_index)
+        to_node = manager.IndexToNode(to_index)
+        return data["distance_matrix"][from_node][to_node]
+
+    transit_callback_index = routing.RegisterTransitCallback(distance_callback)
+    routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
+
+    search_parameters = pywrapcp.DefaultRoutingSearchParameters()
+    search_parameters.first_solution_strategy = (
+        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
+    )
+
+    solution = routing.SolveWithParameters(search_parameters)
+
+    if solution:
+        print_solution(manager, routing, solution)
+
+if __name__ == "__main__":
+    main()

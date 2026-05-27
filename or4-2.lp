@@ -7,29 +7,29 @@
 \     Integer        : 7
 \     Continuous     : 0
 Minimize
- Obj: +1 x[0] +1 x[1] +1 x[2] +1 x[3] +1 x[4] +1 x[5] +1 x[6] 
+ Obj: +1 FRI +1 SAT +1 SUN +1 MON +1 TUE +1 WED +1 THU 
 Subject to
- MON: +1 x[0] +1 x[3] +1 x[4] +1 x[5] +1 x[6]  >= 20
- TUE: +1 x[0] +1 x[1] +1 x[4] +1 x[5] +1 x[6]  >= 16
- WED: +1 x[0] +1 x[1] +1 x[2] +1 x[5] +1 x[6]  >= 13
- THU: +1 x[0] +1 x[1] +1 x[2] +1 x[3] +1 x[6]  >= 16
- FRI: +1 x[0] +1 x[1] +1 x[2] +1 x[3] +1 x[4]  >= 19
- SAT: +1 x[1] +1 x[2] +1 x[3] +1 x[4] +1 x[5]  >= 14
- SUN: +1 x[2] +1 x[3] +1 x[4] +1 x[5] +1 x[6]  >= 12
+ FRI: +1 FRI +1 MON +1 TUE +1 WED +1 THU  >= 19
+ SAT: +1 FRI +1 SAT +1 TUE +1 WED +1 THU  >= 14
+ SUN: +1 FRI +1 SAT +1 SUN +1 WED +1 THU  >= 12
+ MON: +1 FRI +1 SAT +1 SUN +1 MON +1 THU  >= 20
+ TUE: +1 FRI +1 SAT +1 SUN +1 MON +1 TUE  >= 16
+ WED: +1 SAT +1 SUN +1 MON +1 TUE +1 WED  >= 13
+ THU: +1 SUN +1 MON +1 TUE +1 WED +1 THU  >= 16
 Bounds
- 0 <= x[0] <= inf
- 0 <= x[1] <= inf
- 0 <= x[2] <= inf
- 0 <= x[3] <= inf
- 0 <= x[4] <= inf
- 0 <= x[5] <= inf
- 0 <= x[6] <= inf
+ 0 <= FRI <= inf
+ 0 <= SAT <= inf
+ 0 <= SUN <= inf
+ 0 <= MON <= inf
+ 0 <= TUE <= inf
+ 0 <= WED <= inf
+ 0 <= THU <= inf
 Generals
- x[0]
- x[1]
- x[2]
- x[3]
- x[4]
- x[5]
- x[6]
+ FRI
+ SAT
+ SUN
+ MON
+ TUE
+ WED
+ THU
 End
